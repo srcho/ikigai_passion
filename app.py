@@ -69,7 +69,7 @@ if not st.session_state.show_result:
     st.session_state.like_1 = st.text_area("1. 시간가는 줄 모르고 하는 즐거운 일은 무엇인가요?", value=st.session_state.like_1, height=100)
     st.markdown("<br>", unsafe_allow_html=True)
 
-    st.session_state.like_2 = st.text_area("2. 당신의 마음을 설레이게하는 것은 어떤 것인가요?", value=st.session_state.like_2, height=100)
+    st.session_state.like_2 = st.text_area("2. 당신의 마음�� 설레이게하는 것은 어떤 것인가요?", value=st.session_state.like_2, height=100)
     st.markdown("<br>", unsafe_allow_html=True)
 
     st.session_state.like_3 = st.text_area("3. 가장 즐겁게 대화하는 소재는 무엇인가요?", value=st.session_state.like_3, height=100)
@@ -147,7 +147,7 @@ if st.session_state.show_result:
         
     st.success("분석이 완료되었습니다! 🎉")
     
-    # 분석 결과를 마크다운으로 표시
+    # 분석 결과를 ��크다운으로 표시
     st.markdown(f"""
     <div id="result" style="padding: 20px; border: 2px solid #7B68EE;">
     <h1>🌟 빈센트 이키가이 열정편</h1>
@@ -188,11 +188,11 @@ if st.session_state.show_result:
 
             # 웹훅으로 데이터 전송
             webhook_url = "https://hook.us1.make.com/l7y4h8oyj6phluopbtd35bvxk2lagstt"
-            data = {{
+            data = {
                 "email": email,
                 "nickname": st.session_state.nickname,
                 "analysis": html_analysis
-            }}
+            }
             response = requests.post(webhook_url, json=data)
             
             if response.status_code == 200:
