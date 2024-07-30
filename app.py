@@ -1,8 +1,11 @@
 import os
 from openai import OpenAI
 import streamlit as st
+import requests
+from io import BytesIO
+from PIL import Image
 
-st.set_page_config(page_title="이키가이 열정편", page_icon="🌟", layout="centered")
+st.set_page_config(page_title="빈센트 이키가이 열정편", page_icon="🌟", layout="centered")
 
 # CSS를 사용하여 버튼 스타일 변경
 st.markdown("""
@@ -52,7 +55,7 @@ def reset_to_start():
     st.experimental_rerun()
 
 if not st.session_state.show_result:
-    st.title("🌟 이키가이 열정편")
+    st.title("🌟 빈센트 이키가이 열정편")
 
     st.markdown("---")
     st.session_state.nickname = st.text_input("👤 당신을 뭐라고 불러드릴까요?", value=st.session_state.nickname)
@@ -135,7 +138,7 @@ if st.session_state.show_result:
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "당신은 이키가이 분석 전문가입니다. 사용자의 답변을 바탕으로 그들의 이키가이(인생의 목적)를 찾아주세요."},
+                {"role": "system", "content": "당신은 이키가이 분석 전문가입니다. 사용자의 답변을 바탕으로 그들의 이키가이(인생의 목적)를 찾아주세요. 친근한 말투로 한글 문법에 주의해서 답변해주세요."},
                 {"role": "user", "content": prompt}
             ]
         )
@@ -145,5 +148,42 @@ if st.session_state.show_result:
     st.success("분석이 완료되었습니다! 🎉")
     st.markdown(analysis)
 
-    if st.button("처음으로 돌아가기", on_click=reset_to_start):
+    # 이미지로 저장하기 버튼
+    if st.button("이미지로 저장하기"):
+        # 현재 페이지를 이미지로 캡처
+        img_byte_arr = BytesIO()
+        Image.open(st.empty().image).save(img_byte_arr, format='PNG')
+        img_byte_arr = img_byte_arr.getvalue()
+
+        # 이미지 다운로드 버튼 생성
+        st.download_button(
+            label="이미지 다운로드",
+            data=img_byte_arr,
+            file_name="ikigai_analysis.png",
+            mime="image/png"
+        )
+
+    # 웨이트리스트 등록 섹션
+    st.markdown("---")
+    st.markdown("### 이 서비스가 마음에 드셨나요? 더 발전된 서비스가 나오면 알려드릴게요. 빈센트에게 메일을 적어주세요!")
+    email = st.text_input("이메일 주소를 입력해주세요:")
+
+    def send_to_webhook(email):
+        webhook_url = "https://hook.us1.make.com/l7y4h8oyj6phluopbtd35bvxk2lagstt"  # 실제 웹훅 URL로 교체해주세요
+        data = {"email": email}
+        response = requests.post(webhook_url, json=data)
+        return response.status_code == 200
+
+    if st.button("대기리스트 등록", key="waitlist"):
+        if email:
+            if send_to_webhook(email):
+                st.success("대기리스트에 등록되었습니다!")
+            else:
+                st.error("등록 중 오류가 발생했습니다. 나중에 다시 시도해주세요.")
+        else:
+            st.warning("이메일 주소를 입력해주세요.")
+
+    # 처음으로 돌아가기 버튼 (전체 너비)
+    st.markdown("---")
+    if st.button("처음으로 돌아가기", on_click=reset_to_start, use_container_width=True):
         pass
