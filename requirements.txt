@@ -1,4 +1,5 @@
 openai
 streamlit
 requests
-matplotlib
+reportlab
+pdf2image

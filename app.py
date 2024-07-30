@@ -3,7 +3,9 @@ from openai import OpenAI
 import streamlit as st
 import requests
 from io import BytesIO
-import matplotlib.pyplot as plt
+from PIL import Image
+import streamlit.components.v1 as components
+import base64
 
 st.set_page_config(page_title="빈센트 이키가이 열정편", page_icon="🌟", layout="centered")
 
@@ -114,8 +116,6 @@ if st.session_state.show_result:
 
         Present your findings in the following format:
 
-        # 📌{st.session_state.nickname} 열정 분석
-
         ## 열정🔥
         - 유저의 응답을 바탕으로 뷸렛 포인트로 정리.
         - 500자 분량
@@ -125,7 +125,7 @@ if st.session_state.show_result:
         - 500자 분량
 
         ## ✨가치찾기
-        - {st.session_state.nickname}�� 열정과 강점을 이키가이식으로 표현.
+        - {st.session_state.nickname}의 열정과 강점을 이키가이식으로 표현.
         - 500자 분량
 
         ## 🔑키워드
@@ -146,31 +146,57 @@ if st.session_state.show_result:
         analysis = response.choices[0].message.content
         
     st.success("분석이 완료되었습니다! 🎉")
+    
+    # 분석 결과를 마크다운으로 표시
+    st.markdown(f"""
+    <div id="result" style="padding: 20px; border: 2px solid #7B68EE;">
+    <h1>🌟 빈센트 이키가이 열정편</h1>
+    <h2>📌 {st.session_state.nickname} 열정 분석</h2>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # analysis 내용을 별도로 마크다운으로 렌더링
     st.markdown(analysis)
 
-    # 이미지로 저장하기 버튼
-    if st.button("이미지로 저장하기"):
-        # 분석 결과를 이미지로 변환
-        fig, ax = plt.subplots(figsize=(12, 12))
-        ax.text(0.5, 0.5, analysis, ha='center', va='center', wrap=True)
-        ax.axis('off')
-        
-        # 이미지를 바이트 스트림으로 저장
-        img_buf = BytesIO()
-        plt.savefig(img_buf, format='png', bbox_inches='tight', pad_inches=0.5)
-        img_buf.seek(0)
-        
-        # 이미지 다운로드 버튼 생성
-        st.download_button(
-            label="이미지 다운로드",
-            data=img_buf,
-            file_name="ikigai_analysis.png",
-            mime="image/png"
+    # 버튼 위에 패딩 추가
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # 이미지로 저장하기 버튼 (JavaScript 코드)
+    capture_component = """
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script>
+    function captureAndDownload() {
+        const element = document.getElementById('result');
+        html2canvas(element, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: null
+        }).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.href = imgData;
+            link.download = 'ikigai_analysis.png';
+            link.click();
+        });
+    }
+    </script>
+    """
+    components.html(capture_component, height=0)
+
+    # Streamlit 버튼으로 이미지 다운로드 기능 호출
+    if st.button("분석 결과 이미지로 저장하기", key="download_image"):
+        components.html(
+            """
+            <script>
+            captureAndDownload();
+            </script>
+            """,
+            height=0
         )
 
     # 웨이트리스트 등록 섹션
     st.markdown("---")
-    st.markdown("### 이 서비스가 마음에 드셨나요? 더 발전된 서비스가 나오면 알려드릴게요. 빈센트에게 메일을 적어주세요!")
+    st.markdown("## 이 서비스가 마음에 드셨나요? 더 발전된 서비스가 나오면 알려드릴게요. 빈센트에게 메일을 적어주세요!")
     email = st.text_input("이메일 주소를 입력해주세요:")
 
     def send_to_webhook(email):
@@ -187,7 +213,6 @@ if st.session_state.show_result:
                 st.error("등록 중 오류가 발생했습니다. 나중에 다시 시도해주세요.")
         else:
             st.warning("이메일 주소를 입력해주세요.")
-
     # 처음으로 돌아가기 버튼 (전체 너비)
     st.markdown("---")
     if st.button("처음으로 돌아가기", on_click=reset_to_start, use_container_width=True):
