@@ -151,7 +151,6 @@ if st.session_state.show_result:
     st.markdown(f"""
     <div id="result" style="padding: 20px; border: 2px solid #7B68EE;">
     <h1>🌟 빈센트 이키가이 열정편</h1>
-    <h2>📌 {st.session_state.nickname} 열정 분석</h2>
     </div>
     """, unsafe_allow_html=True)
     
@@ -159,44 +158,33 @@ if st.session_state.show_result:
     st.markdown(analysis)
 
     # 버튼 위에 패딩 추가
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<br><br>", unsafe_allow_html=True)
 
-    # 이미지로 저장하기 버튼 (JavaScript 코드)
-    capture_component = """
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-    <script>
-    function captureAndDownload() {
-        const element = document.getElementById('result');
-        html2canvas(element, {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: null
-        }).then(canvas => {
-            const imgData = canvas.toDataURL('image/png');
-            const link = document.createElement('a');
-            link.href = imgData;
-            link.download = 'ikigai_analysis.png';
-            link.click();
-        });
-    }
-    </script>
-    """
-    components.html(capture_component, height=0)
+    # 이메일 입력 필드
+    email = st.text_input("결과를 받아볼 이메일 주소를 입력해주세요:")
 
-    # Streamlit 버튼으로 이미지 다운로드 기능 호출
-    if st.button("분석 결과 이미지로 저장하기", key="download_image"):
-        components.html(
-            """
-            <script>
-            captureAndDownload();
-            </script>
-            """,
-            height=0
-        )
+    # 결과 전송 버튼
+    if st.button("결과 전송하기"):
+        if email:
+            # 웹훅으로 데이터 전송
+            webhook_url = "https://hook.us1.make.com/your_webhook_url_here"  # 실제 웹훅 URL로 교체해주세요
+            data = {
+                "email": email,
+                "nickname": st.session_state.nickname,
+                "analysis": analysis
+            }
+            response = requests.post(webhook_url, json=data)
+            
+            if response.status_code == 200:
+                st.success("결과가 성공적으로 전송되었습니다. 곧 이메일로 받아보실 수 있습니다!")
+            else:
+                st.error("결과 전송 중 오류가 발생했습니다. 나중에 다시 시도해주세요.")
+        else:
+            st.warning("이메일 주소를 입력해주세요.")
 
     # 웨이트리스트 등록 섹션
     st.markdown("---")
-    st.markdown("## 이 서비스가 마음에 드셨나요? 더 발전된 서비스가 나오면 알려드릴게요. 빈센트에게 메일을 적어주세요!")
+    st.markdown("### 이 서비스가 마음에 드셨나요? 더 발전된 서비스가 나오면 알려드릴게요. 빈센트에게 메일을 적어주세요!")
     email = st.text_input("이메일 주소를 입력해주세요:")
 
     def send_to_webhook(email):
@@ -205,7 +193,7 @@ if st.session_state.show_result:
         response = requests.post(webhook_url, json=data)
         return response.status_code == 200
 
-    if st.button("다음버전 대기리스트 등록", key="waitlist"):
+    if st.button("waitlist 등록하고 결과 메일로 받기", key="waitlist"):
         if email:
             if send_to_webhook(email):
                 st.success("대기리스트에 등록되었습니다!")
