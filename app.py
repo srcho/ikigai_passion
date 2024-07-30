@@ -164,10 +164,10 @@ if st.session_state.show_result:
     email = st.text_input("결과를 받아볼 이메일 주소를 입력해주세요:")
 
     # 결과 전송 버튼
-    if st.button("결과 전송하기"):
+    if st.button("결과 전송하고 waitlist 등록하기"):
         if email:
             # 웹훅으로 데이터 전송
-            webhook_url = "https://hook.us1.make.com/your_webhook_url_here"  # 실제 웹훅 URL로 교체해주세요
+            webhook_url = "https://hook.us1.make.com/l7y4h8oyj6phluopbtd35bvxk2lagstt"  # 실제 웹훅 URL로 교체해주세요
             data = {
                 "email": email,
                 "nickname": st.session_state.nickname,
@@ -182,25 +182,6 @@ if st.session_state.show_result:
         else:
             st.warning("이메일 주소를 입력해주세요.")
 
-    # 웨이트리스트 등록 섹션
-    st.markdown("---")
-    st.markdown("### 이 서비스가 마음에 드셨나요? 더 발전된 서비스가 나오면 알려드릴게요. 빈센트에게 메일을 적어주세요!")
-    email = st.text_input("이메일 주소를 입력해주세요:")
-
-    def send_to_webhook(email):
-        webhook_url = "https://hook.us1.make.com/l7y4h8oyj6phluopbtd35bvxk2lagstt"  # 실제 웹훅 URL로 교체해주세요
-        data = {"email": email}
-        response = requests.post(webhook_url, json=data)
-        return response.status_code == 200
-
-    if st.button("waitlist 등록하고 결과 메일로 받기", key="waitlist"):
-        if email:
-            if send_to_webhook(email):
-                st.success("대기리스트에 등록되었습니다!")
-            else:
-                st.error("등록 중 오류가 발생했습니다. 나중에 다시 시도해주세요.")
-        else:
-            st.warning("이메일 주소를 입력해주세요.")
     # 처음으로 돌아가기 버튼 (전체 너비)
     st.markdown("---")
     if st.button("처음으로 돌아가기", on_click=reset_to_start, use_container_width=True):
