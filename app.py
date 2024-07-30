@@ -3,7 +3,7 @@ from openai import OpenAI
 import streamlit as st
 import requests
 from io import BytesIO
-from PIL import Image
+import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="빈센트 이키가이 열정편", page_icon="🌟", layout="centered")
 
@@ -125,7 +125,7 @@ if st.session_state.show_result:
         - 500자 분량
 
         ## ✨가치찾기
-        - {st.session_state.nickname}의 열정과 강점을 이키가이식으로 표현.
+        - {st.session_state.nickname}�� 열정과 강점을 이키가이식으로 표현.
         - 500자 분량
 
         ## 🔑키워드
@@ -150,15 +150,20 @@ if st.session_state.show_result:
 
     # 이미지로 저장하기 버튼
     if st.button("이미지로 저장하기"):
-        # 현재 페이지를 이미지로 캡처
-        img_byte_arr = BytesIO()
-        Image.open(st.empty().image).save(img_byte_arr, format='PNG')
-        img_byte_arr = img_byte_arr.getvalue()
-
+        # 분석 결과를 이미지로 변환
+        fig, ax = plt.subplots(figsize=(12, 12))
+        ax.text(0.5, 0.5, analysis, ha='center', va='center', wrap=True)
+        ax.axis('off')
+        
+        # 이미지를 바이트 스트림으로 저장
+        img_buf = BytesIO()
+        plt.savefig(img_buf, format='png', bbox_inches='tight', pad_inches=0.5)
+        img_buf.seek(0)
+        
         # 이미지 다운로드 버튼 생성
         st.download_button(
             label="이미지 다운로드",
-            data=img_byte_arr,
+            data=img_buf,
             file_name="ikigai_analysis.png",
             mime="image/png"
         )
@@ -174,7 +179,7 @@ if st.session_state.show_result:
         response = requests.post(webhook_url, json=data)
         return response.status_code == 200
 
-    if st.button("대기리스트 등록", key="waitlist"):
+    if st.button("다음버전 대기리스트 등록", key="waitlist"):
         if email:
             if send_to_webhook(email):
                 st.success("대기리스트에 등록되었습니다!")
