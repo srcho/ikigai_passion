@@ -166,13 +166,33 @@ if st.session_state.show_result:
     # 결과 전송 버튼
     if st.button("결과 전송하고 waitlist 등록하기"):
         if email:
+            # 분석 결과를 HTML 형식으로 변환
+            formatted_analysis = analysis.replace('## ', '<h2>').replace('\n', '<br>')
+            
+            # HTML 형식으로 분석 결과 변환
+            html_analysis = f"""
+            <html>
+            <head>
+                <style>
+                    body {{ font-family: Arial, sans-serif; }}
+                    h1 {{ color: #7B68EE; }}
+                    h2 {{ color: #9370DB; }}
+                </style>
+            </head>
+            <body>
+                <h1>🌟 빈센트 이키가이 열정편</h1>
+                {formatted_analysis}
+            </body>
+            </html>
+            """
+
             # 웹훅으로 데이터 전송
-            webhook_url = "https://hook.us1.make.com/l7y4h8oyj6phluopbtd35bvxk2lagstt"  # 실제 웹훅 URL로 교체해주세요
-            data = {
+            webhook_url = "https://hook.us1.make.com/l7y4h8oyj6phluopbtd35bvxk2lagstt"
+            data = {{
                 "email": email,
                 "nickname": st.session_state.nickname,
-                "analysis": analysis
-            }
+                "analysis": html_analysis
+            }}
             response = requests.post(webhook_url, json=data)
             
             if response.status_code == 200:
