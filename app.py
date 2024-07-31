@@ -69,7 +69,7 @@ if not st.session_state.show_result:
     st.session_state.like_1 = st.text_area("1. 시간가는 줄 모르고 하는 즐거운 일은 무엇인가요?", value=st.session_state.like_1, height=100)
     st.markdown("<br>", unsafe_allow_html=True)
 
-    st.session_state.like_2 = st.text_area("2. 당신의 마음�� 설레이게하는 것은 어떤 것인가요?", value=st.session_state.like_2, height=100)
+    st.session_state.like_2 = st.text_area("2. 당신의 마음을 설레이게하는 것은 어떤 것인가요?", value=st.session_state.like_2, height=100)
     st.markdown("<br>", unsafe_allow_html=True)
 
     st.session_state.like_3 = st.text_area("3. 가장 즐겁게 대화하는 소재는 무엇인가요?", value=st.session_state.like_3, height=100)
