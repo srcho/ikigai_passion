@@ -174,9 +174,9 @@ if st.session_state.show_result:
             <html>
             <head>
                 <style>
-                    body {{ font-family: Arial, sans-serif; }}
-                    h1 {{ color: #7B68EE; }}
-                    h2 {{ color: #9370DB; }}
+                    body {{ color: black; font-family: Arial, sans-serif; }}
+                    h1 {{ color: black; }}
+                    h2 {{ color: black; }}
                 </style>
             </head>
             <body>
